@@ -1,0 +1,12 @@
+*.pyc
+*.log
+*.err
+*.out
+._*
+.svn
+.svn/**
+**/.svn/**
+.project
+*.sqlite
+*.sublime-workspace
+*.sublime-project

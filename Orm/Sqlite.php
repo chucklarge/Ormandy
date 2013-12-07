@@ -1,10 +1,10 @@
 <?php
 class Orm_Sqlite extends Orm_Sources {
-    public function __construct($model, $db, $table, $fields = []) {
-        parent::__construct($model, $db, $table, $fields);
+    public function __construct($schema) {
+        parent::__construct($schema);
         try {
             $path = '/Users/cclark/Dropbox/github/orm/dbs/';
-            $this->dbh = new PDO('sqlite:'.$path.$db);
+            $this->dbh = new PDO('sqlite:'.$path.$this->schema->db);
         }
         catch(PDOException $e) {
             Logger::error($e->getMessage());
@@ -17,7 +17,6 @@ class Orm_Sqlite extends Orm_Sources {
     }
 
     public function formatPrepared($keys) {
-
         $w = [];
         foreach ($keys as $key) {
             $w[] = $key .'=?';
@@ -27,14 +26,14 @@ class Orm_Sqlite extends Orm_Sources {
 
 
     public function find($value) {
-        $pks = $this->getPrimaryKeys();
-        $sql = 'select * from ' . $this->table . ' where ' . $this->formatPrepared($pks);
+        $pks = $this->schema->primary_keys;
+        $sql = 'select * from ' . $this->schema->table . ' where ' . $this->formatPrepared($pks);
         $params = is_array($value) ? $value : [$value];
         return $this->query($sql, $params, true);
     }
 
     public function findAll() {
-        $sql = 'select * from ' . $this->table;
+        $sql = 'select * from ' . $this->schema->table;
         return $this->query($sql, [], true);
     }
 
@@ -49,7 +48,7 @@ class Orm_Sqlite extends Orm_Sources {
         foreach($cols as $col) {
             $where[] = $col . '=? ';
         }
-        $sql = 'select * from ' . $this->table . ' where ' . implode(' and ', $where);
+        $sql = 'select * from ' . $this->schema->table . ' where ' . implode(' and ', $where);
         return $this->query($sql, $params, true);
     }
 
@@ -69,7 +68,8 @@ class Orm_Sqlite extends Orm_Sources {
     }
 
     protected function createObject($result) {
-        $o = new $this->model;
+        $m = Orm_Registry::$models[$this->schema->model]['model_class'];
+        $o = new $m;
         foreach ($result as $k => $v) {
             $o->$k = $v;
         }

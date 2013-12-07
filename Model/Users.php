@@ -7,17 +7,17 @@ Orm_Registry::registerModel(
 );
 
 class Model_Users extends Orm_Orm {
-    public function setUp() {
-        $this->setModel('Users');
-        $this->setDb('users.sqlite');
-        $this->setTable('users');
+    public static function setUp(Orm_Schema $schema) {
+        $schema->setModel('Users');
+        $schema->setDb('users.sqlite');
+        $schema->setTable('users');
 
-        $this->addPKField('user_id');
-        $this->addField('first_name');
-        $this->addField('last_name');
-        $this->addField('email');
-        $this->addCreateDateField('create_date');
-        $this->addUpdateDateField('update_date');
+        $schema->addPKField('user_id');
+        $schema->addField('first_name');
+        $schema->addField('last_name');
+        $schema->addField('email');
+        $schema->addCreateDateField('create_date');
+        $schema->addUpdateDateField('update_date');
     }
 
     public function fullName() {
@@ -26,19 +26,15 @@ class Model_Users extends Orm_Orm {
 }
 
 class UsersFinder extends Orm_Orm {
-    public function setUp() {
-        $this->setModel('Users');
-        $this->setDb('users.sqlite');
-        $this->setTable('users');
-
-        $this->registerQuery('findByFirstName', ['first_name']);
+    public static function setUp(Orm_Schema $schema) {
+        $schema->registerQuery('findByFirstName', ['first_name']);
     }
 
-    /*
+/*
     public function find($pk) {
         $sql = 'select * from users where user_id=?';
         $params = [$pk];
         return $this->query($sql, $params, true);
     }
-    */
+*/
 }
