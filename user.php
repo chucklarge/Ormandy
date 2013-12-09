@@ -3,8 +3,12 @@
 require_once "Loader.php";
 
 $uf = new UsersFinder();
-var_dump($uf->find(4));
+
+echo $uf->user_id;
+
+
 /*
+var_dump($uf->find(4));
 var_dump($uf->findAll());
 var_dump($uf->findByFirstName('alex'));
 
