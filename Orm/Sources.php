@@ -1,5 +1,13 @@
 <?php
 abstract class Orm_Sources {
+    const NO_RESULT       = 0;
+    const SINGLE_RESULT   = 1;
+    const MULTIPLE_RESULT = 2;
+
+    const NO_OBJECT   = 0;
+    const THIS_OBJECT = 1;
+    const NEW_OBJECT  = 2;
+
     protected $config;
     protected $dbh;
     protected $schema;
@@ -13,10 +21,69 @@ abstract class Orm_Sources {
         $this->dbh = null;
     }
 
-    abstract public function find($pk);
-    abstract public function findAll();
-    abstract public function store();
-    abstract public function delete();
+    public function find($value) {
+        return $this->f($value, self::NEW_OBJECT);
+    }
+
+    protected function f($value, $object_type) {
+        $pks = $this->schema->primary_keys;
+        $sql = 'select * from ' . $this->schema->table . ' where ' . $this->formatPreparedWhere($pks);
+        $params = is_array($value) ? $value : [$value];
+        $r = $this->query($sql, $params, self::SINGLE_RESULT, $object_type);
+        if (count($r)) {
+            return $r;
+        } else {
+            throw new Exception("not found - fix me");
+        }
+    }
+
+    public function findAll($limit = null, $offset = null, $sort = null, $dir = null) {
+        $sql = 'select * from ' . $this->schema->table;
+        $parms = [];
+        if ($limit) {
+            $sql .= ' limit = ?';
+            $params[] = $limit;
+        }
+        if ($offset) {
+            $sql .= ' offset = ?';
+            $params[] = $offset;
+        }
+        if ($sort) {
+            $sql .= ' sort by ?';
+            $params[] = $sort;
+        }
+        return $this->query($sql, $params, self::MULTIPLE_RESULTS, self::NEW_OBJECT);
+    }
+
+    public function store() {
+        if ($this->schema->loaded_from_db) {
+            $pkfv = $this->schema->getPKFieldsAndValues();
+            $dfv  = $this->schema->getDirtyFieldsAndValues();
+            $sql = 'update ' . $this->schema->table .' set ' . $this->formatPreparedSet($dfv['fields']) .
+                   ' where ' . $this->formatPreparedWhere($pkfv['fields']);
+            $params = array_merge($dfv['values'], $pkfv['values']);
+        } else {
+            $fv = $this->schema->getFieldsAndValues();
+            $f = implode(', ', $fv['fields']);
+            $sql = 'insert into ' . $this->schema->table . '(' . $f . ')
+                    values('. $this->generatePlaceholders(count($fv['values'])) . ')';
+            $params = $fv['values'];
+            $pkfv = $this->schema->getPKFieldsAndValues();
+        }
+        $this->query($sql, $params, self::NO_RESULT);
+        return $this->f($pkfv['values'], self::THIS_OBJECT);
+    }
+
+    public function delete() {
+        $fv = $this->schema->getPKFieldsAndValues();
+        $sql = 'delete from ' . $this->schema->table . '(' . $f . ')
+                where xxx';
+    }
+
+    public function getData() {
+        return $this->schema->getData();
+    }
+
     abstract public function query($sql, array $params);
 
     public function __call($method_name, $args) {
@@ -26,5 +93,68 @@ abstract class Orm_Sources {
             $params = is_array($args) ? $args : [$args];
             return $this->runRegistered($cols, $params);
         }
+    }
+
+    // ---
+    protected function runRegistered(array $cols, array $params) {
+        $where = [];
+        foreach($cols as $col) {
+            $where[] = $col . '=? ';
+        }
+        $sql = 'select * from ' . $this->schema->table . ' where ' . implode(' and ', $where);
+        return $this->query($sql, $params, false, true);
+    }
+
+    protected function createObject($result) {
+        $m = Orm_Registry::$models[$this->schema->model]['model_class'];
+        $o = new $m;
+        foreach ($result as $k => $v) {
+            $o->$k = $v;
+        }
+        $o->loaded_from_db = true;
+        return $o;
+    }
+
+    protected function setThisObject($result) {
+        foreach ($result as $k => $v) {
+            $this->schema->$k = $v;
+        }
+        $this->schema->loaded_from_db = true;
+        return $this;
+    }
+
+    protected function setResults($object_type, $results) {
+        $r = null;
+        if ($object_type === self::NO_OBJECT) {
+            $r = $results;
+        } else if ($object_type === self::THIS_OBJECT) {
+            $r = $this->setThisObject($results);
+        } else if ($object_type === self::NEW_OBJECT) {
+            $r = $this->createObject($results);
+        }
+        return $r;
+    }
+
+
+    protected function format($keys) {
+        $w = [];
+        foreach ($keys as $key) {
+            $w[] = $key .'=?';
+        }
+        return $w;
+    }
+
+    protected function formatPreparedSet($keys) {
+        return implode(', ', $this->format($keys));
+    }
+
+    protected function formatPreparedWhere($keys) {
+        return implode(' and ', $this->format($keys));
+    }
+
+    protected function generatePlaceholders($size, $ph='?') {
+
+        $a = array_fill(0, $size, $ph);
+        return implode(', ', $a);
     }
 }

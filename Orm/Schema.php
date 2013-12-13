@@ -6,6 +6,8 @@ class Orm_Schema {
     public $table;
     public $primary_keys = [];
     public $fields = [];
+    public $loaded_from_db = false;
+    public $dirty_fields = [];  // fields that have changed after loaded from db
 
     public $registered_queries = [];
 
@@ -17,7 +19,7 @@ class Orm_Schema {
         $this->db = $db;
     }
 
-    public function setTable($table) {
+    public function setTableName($table) {
         $this->table = $table;
     }
 
@@ -27,11 +29,11 @@ class Orm_Schema {
     }
 
     public function addCreateDateField($field, $column_type = '', $column_size = []) {
-        $this->addField($field, '', [], 'create_date');
+        $this->addField($field, '', []);
     }
 
     public function addUpdateDateField($field, $column_type = '', $column_size = []) {
-        $this->addField($field, '', [], 'update_date');
+        $this->addField($field, '', []);
     }
 
     public function addField($field, $column_type = '', $column_size = []) {
@@ -44,9 +46,45 @@ class Orm_Schema {
         $this->$field = null;
     }
 
+    public function getPKFieldsAndValues() {
+        $f = [];
+        $v = [];
+        foreach ($this->primary_keys as $pk) {
+            $f[] = $pk;
+            $v[] = $this->fields[$pk]['value'];
+        }
+        return ['fields' => $f, 'values' => $v];
+    }
+
+    public function getDirtyFieldsAndValues() {
+        $f = [];
+        $v = [];
+        foreach ($this->dirty_fields as $df) {
+            $f[] = $df;
+            $v[] = $this->fields[$df]['value'];
+        }
+        return ['fields' => $f, 'values' => $v];
+    }
+
+    public function getFieldsAndValues() {
+        $f = [];
+        $v = [];
+        foreach ($this->fields as $field) {
+            $f[] = $field['field'];
+            $v[] = $field['value'];
+        }
+        return ['fields' => $f, 'values' => $v];
+    }
+
+    public function getData() {
+        $d = [];
+        foreach ($this->fields as $field) {
+            $d[$field['field']] = $field['value'];
+        }
+        return $d;
+    }
+
     public function __get($name) {
-var_dump($this->fields);
-die();
         if (isset($this->fields[$name])) {
             return $this->fields[$name]['value'];
         } else {
@@ -55,7 +93,14 @@ die();
     }
 
     public function __set($name, $value) {
-        $this->$name = $value;
+        if (isset($this->fields[$name])) {
+            $this->fields[$name]['value'] = $value;
+            if ($this->loaded_from_db) {
+                $this->dirty_fields[] = $name;
+            }
+        } else {
+            $this->$name = $value;  // allow adhoc member var assignment
+        }
     }
 
     public function registerQuery($name, $params) {

@@ -6,11 +6,10 @@ Orm_Registry::registerModel(
     'Model_UsersFinder'
 );
 
-class Model_Users extends Orm_Orm {
+class Model_Users extends Orm_ModelBase {
     public static function setUp(Orm_Schema $schema) {
-        $schema->setModel('Users');
         $schema->setDb('users.sqlite');
-        $schema->setTable('users');
+        $schema->setTableName('users');
 
         $schema->addPKField('user_id');
         $schema->addField('first_name');
@@ -25,16 +24,14 @@ class Model_Users extends Orm_Orm {
     }
 }
 
-class UsersFinder extends Orm_Orm {
+class Model_UsersFinder extends Orm_ModelBase {
     public static function setUp(Orm_Schema $schema) {
         $schema->registerQuery('findByFirstName', ['first_name']);
     }
 
-/*
-    public function find($pk) {
-        $sql = 'select * from users where user_id=?';
-        $params = [$pk];
+    public function findByLastName($last_name) {
+        $sql = 'select * from users where last_name=?';
+        $params = [$last_name];
         return $this->query($sql, $params, true);
     }
-*/
 }
