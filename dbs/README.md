@@ -1,6 +1,9 @@
-load the db
+load db
 
     sqlite3 site.sqlite < site.sql
+    
+open db
+
     sqlite3 site.sqlite
 
 queries
