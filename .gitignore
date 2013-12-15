@@ -7,7 +7,6 @@
 .svn/**
 **/.svn/**
 .project
-*.sqlite
 *.sublime-workspace
 *.sublime-project
 .DS_Store
