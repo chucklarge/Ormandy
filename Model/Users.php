@@ -8,7 +8,7 @@ Orm_Registry::registerModel(
 
 class Model_Users extends Orm_ModelBase {
     public static function setUp(Orm_Schema $schema) {
-        $schema->setDb('users.sqlite');
+        $schema->setDb('site.sqlite');
         $schema->setTableName('users');
 
         $schema->addPKField('user_id');

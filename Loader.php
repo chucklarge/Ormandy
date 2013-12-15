@@ -7,3 +7,4 @@ require_once "Orm/Sources.php";
 require_once "Orm/Sqlite.php";
 
 require_once "Model/Users.php";
+require_once "Model/Shops.php";

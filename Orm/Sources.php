@@ -39,7 +39,7 @@ abstract class Orm_Sources {
 
     public function findAll($limit = null, $offset = null, $sort = null, $dir = null) {
         $sql = 'select * from ' . $this->schema->table;
-        $parms = [];
+        $params = [];
         if ($limit) {
             $sql .= ' limit = ?';
             $params[] = $limit;
@@ -52,7 +52,7 @@ abstract class Orm_Sources {
             $sql .= ' sort by ?';
             $params[] = $sort;
         }
-        return $this->query($sql, $params, self::MULTIPLE_RESULTS, self::NEW_OBJECT);
+        return $this->query($sql, $params, self::MULTIPLE_RESULT, self::NEW_OBJECT);
     }
 
     public function store() {
@@ -75,9 +75,11 @@ abstract class Orm_Sources {
     }
 
     public function delete() {
-        $fv = $this->schema->getPKFieldsAndValues();
-        $sql = 'delete from ' . $this->schema->table . '(' . $f . ')
-                where xxx';
+        $pkfv = $this->schema->getPKFieldsAndValues();
+        $sql = 'delete from ' . $this->schema->table . ' where ' . $this->formatPreparedWhere($pkfv['fields']);
+        $params = $pkfv['values'];
+        $this->query($sql, $params, self::NO_RESULT);
+        $this->schema = null;
     }
 
     public function getData() {
