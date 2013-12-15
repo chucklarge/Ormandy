@@ -6,7 +6,7 @@ Orm_Registry::registerModel(
     'Model_UsersFinder'
 );
 
-class Model_Users extends Orm_ModelBase {
+class Model_Users extends Orm_Model {
     public static function setUp(Orm_Schema $schema) {
         $schema->setDb('site.sqlite');
         $schema->setTableName('users');
@@ -24,7 +24,7 @@ class Model_Users extends Orm_ModelBase {
     }
 }
 
-class Model_UsersFinder extends Orm_ModelBase {
+class Model_UsersFinder extends Orm_Model {
     public static function setUp(Orm_Schema $schema) {
         $schema->registerQuery('findByFirstName', ['first_name']);
     }

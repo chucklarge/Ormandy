@@ -6,7 +6,7 @@ Orm_Registry::registerModel(
     'Model_ShopsFinder'
 );
 
-class Model_Shops extends Orm_ModelBase {
+class Model_Shops extends Orm_Model {
     public static function setUp(Orm_Schema $schema) {
         $schema->setDb('site.sqlite');
         $schema->setTableName('shops');
@@ -24,7 +24,7 @@ class Model_Shops extends Orm_ModelBase {
     }
 }
 
-class Model_ShopsFinder extends Orm_ModelBase {
+class Model_ShopsFinder extends Orm_Model {
     public static function setUp(Orm_Schema $schema) {
         $schema->registerQuery('findByUserId', ['user_id']);
     }

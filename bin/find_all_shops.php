@@ -1,6 +1,6 @@
 <?php
 
-require_once "../../Loader.php";
+require_once "../Loader.php";
 
 $sf = new Model_ShopsFinder();
 $shops = $sf->findAll();

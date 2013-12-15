@@ -1,6 +1,6 @@
 <?php
 
-require_once "../../Loader.php";
+require_once "../Loader.php";
 
 $uf = new Model_UsersFinder();
 $u = $uf->find(1386972656);

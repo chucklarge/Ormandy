@@ -1,6 +1,6 @@
 <?php
 
-require_once "../../Loader.php";
+require_once "../Loader.php";
 
 $u = new Model_Users();
 $u->user_id = time();

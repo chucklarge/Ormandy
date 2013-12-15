@@ -1,5 +1,5 @@
 <?php
-abstract class Orm_ModelBase {
+abstract class Orm_Model {
     protected $source = null;
     protected $schema = null;
 
@@ -27,7 +27,7 @@ abstract class Orm_ModelBase {
     protected function getSource() {
         $source = null;
         if ('sqlite' === 'sqlite') {
-            $source = new Orm_Sqlite($this->schema);
+            $source = new Orm_Sources_Sqlite($this->schema);
         } else  {
         }
         return $source;

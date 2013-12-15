@@ -46,6 +46,10 @@ class Orm_Schema {
         $this->$field = null;
     }
 
+    public function registerQuery($name, $params) {
+        $this->registered_queries[$name] = $params;
+    }
+
     public function getPKFieldsAndValues() {
         $f = [];
         $v = [];
@@ -103,7 +107,4 @@ class Orm_Schema {
         }
     }
 
-    public function registerQuery($name, $params) {
-        $this->registered_queries[$name] = $params;
-    }
 }

@@ -1,5 +1,5 @@
 <?php
-class Orm_Sqlite extends Orm_Sources {
+class Orm_Sources_Sqlite extends Orm_Sources {
 
     public function __construct($schema) {
         parent::__construct($schema);
