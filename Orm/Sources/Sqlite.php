@@ -21,7 +21,9 @@ class Orm_Sources_Sqlite extends Orm_Sources {
             $sth->execute($params);
             if ($result_type === Orm_Sources::SINGLE_RESULT) {
                 $r = $sth->fetch(PDO::FETCH_ASSOC);
-                $results = $this->setResults($object_type, $r);
+                if ($r && count($r)) {
+                    $results = $this->setResults($object_type, $r);
+                }
             } else if ($result_type === Orm_Sources::MULTIPLE_RESULT) {
                 while ($r = $sth->fetch(PDO::FETCH_ASSOC)) {
                     $results[] = $this->setResults($object_type, $r);

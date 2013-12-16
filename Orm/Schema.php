@@ -47,7 +47,7 @@ class Orm_Schema {
     }
 
     public function registerQuery($name, $params,
-        $result_type = Orm_Sources::SINGLE_RESULT, $object_type = Orm_Sources::THIS_OBJECT) {
+        $result_type = Orm_Sources::MULTIPLE_RESULT, $object_type = Orm_Sources::THIS_OBJECT) {
         $this->registered_queries[$name] = [
             'params' => is_array($params) ? $params : [$params],
             'result_type' => $result_type,

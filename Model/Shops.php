@@ -12,7 +12,7 @@ class Model_Shops extends Orm_Model {
         $schema->addUpdateDateField('update_date');
 
         // register finders
-        $schema->registerQuery('findByUserId', ['user_id']);
+        $schema->registerQuery('findByUserId', ['user_id'], Orm_Sources::SINGLE_RESULT);
     }
 
     public function User() {

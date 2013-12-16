@@ -113,7 +113,7 @@ abstract class Orm_Sources {
         return $o;
     }
 
-    protected function setThisObject($result) {
+    protected function setThisObject(array $result) {
         foreach ($result as $k => $v) {
             $this->schema->$k = $v;
         }

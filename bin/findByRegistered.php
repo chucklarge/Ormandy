@@ -3,5 +3,8 @@
 require_once "../Loader.php";
 
 $uf = new Model_Users();
-$u = $uf->findByFirstName('chuck');
-var_dump($u->getData());
+$us = $uf->findByFirstName('a');
+var_dump($us);
+foreach ($us as $u) {
+    var_dump($u->getData());
+}
