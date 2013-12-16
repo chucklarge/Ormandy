@@ -2,7 +2,7 @@
 
 require_once "../Loader.php";
 
-$sf = new Model_ShopsFinder();
+$sf = new Model_Shops();
 $s = $sf->find(2342);
 
 var_dump($s->getData());

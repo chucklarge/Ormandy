@@ -90,26 +90,22 @@ abstract class Orm_Sources {
 
     public function __call($method_name, $args) {
         if (isset($this->schema->registered_queries[$method_name])) {
-            $cols = is_array($this->schema->registered_queries[$method_name]) ?
-                $this->schema->registered_queries[$method_name] : [$this->schema->registered_queries[$method_name]];
+            $rq = $this->schema->registered_queries[$method_name];
             $params = is_array($args) ? $args : [$args];
-            return $this->runRegistered($cols, $params);
+            return $this->runRegistered($rq, $params);
         }
     }
 
     // ---
-    protected function runRegistered(array $cols, array $params) {
-        $where = [];
-        foreach($cols as $col) {
-            $where[] = $col . '=? ';
-        }
+    protected function runRegistered(array $registered_query, array $params) {
+        $cols = $registered_query['params'];
+        $where = $this->format($cols);
         $sql = 'select * from ' . $this->schema->table . ' where ' . implode(' and ', $where);
-        return $this->query($sql, $params, false, true);
+        return $this->query($sql, $params, $registered_query['result_type'], $registered_query['object_type']);
     }
 
     protected function createObject($result) {
-        $m = Orm_Registry::$models[$this->schema->model]['model_class'];
-        $o = new $m;
+        $o = new $this->schema->model();
         foreach ($result as $k => $v) {
             $o->$k = $v;
         }
@@ -137,11 +133,10 @@ abstract class Orm_Sources {
         return $r;
     }
 
-
     protected function format($keys) {
         $w = [];
         foreach ($keys as $key) {
-            $w[] = $key .'=?';
+            $w[] = $key .' = ?';
         }
         return $w;
     }
@@ -154,8 +149,7 @@ abstract class Orm_Sources {
         return implode(' and ', $this->format($keys));
     }
 
-    protected function generatePlaceholders($size, $ph='?') {
-
+    protected function generatePlaceholders($size, $ph = '?') {
         $a = array_fill(0, $size, $ph);
         return implode(', ', $a);
     }

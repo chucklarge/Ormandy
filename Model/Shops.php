@@ -1,13 +1,7 @@
 <?php
-
-Orm_Registry::registerModel(
-    'Shops',
-    'Model_Shops',
-    'Model_ShopsFinder'
-);
-
 class Model_Shops extends Orm_Model {
-    public static function setUp(Orm_Schema $schema) {
+
+    public function setUp(Orm_Schema $schema) {
         $schema->setDb('site.sqlite');
         $schema->setTableName('shops');
 
@@ -16,22 +10,20 @@ class Model_Shops extends Orm_Model {
         $schema->addField('shop_name');
         $schema->addCreateDateField('create_date');
         $schema->addUpdateDateField('update_date');
-    }
 
-    public function User() {
-        $uf = new Model_UsersFinder();
-        return $uf->find($this->user_id);
-    }
-}
-
-class Model_ShopsFinder extends Orm_Model {
-    public static function setUp(Orm_Schema $schema) {
+        // register finders
         $schema->registerQuery('findByUserId', ['user_id']);
     }
 
+    public function User() {
+        $uf = new Model_Users();
+        return $uf->find($this->user_id);
+    }
+
+    // custom finders
     public function findByShopName($shop_name) {
         $sql = 'select * from shops where shop_name=?';
         $params = [$shop_name];
-        return $this->query($sql, $params, true);
+        return $this->query($sql, $params);
     }
 }

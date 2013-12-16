@@ -2,7 +2,7 @@
 
 require_once "../Loader.php";
 
-$sf = new Model_ShopsFinder();
+$sf = new Model_Shops();
 $shops = $sf->findAll();
 foreach ($shops as $shop) {
     $user = $shop->User();

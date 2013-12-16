@@ -5,24 +5,12 @@ abstract class Orm_Model {
 
     public function __construct() {
         $this->schema = new Orm_Schema();
-
-        // if a finder instance, run the model setup
         $class = get_called_class();
-
-        if (isset(Orm_Registry::$finder_classes[$class])) {
-            $this->schema->setModel(Orm_Registry::$finder_classes[$class]['model']);
-            $m = Orm_Registry::$finder_classes[$class]['model_class'];
-            $c = new $m();
-            $c::setUp($this->schema);
-        } else {
-            $this->schema->setModel(Orm_Registry::$model_classes[$class]['model']);
-        }
-        static::setUp($this->schema);
+        $this->schema->setModel($class);
+        $this->setUp($this->schema);
     }
 
-    public static function setUp() {
-        echo "uh oh\n";
-    }
+    abstract public function setUp(Orm_Schema $schema);
 
     protected function getSource() {
         $source = null;

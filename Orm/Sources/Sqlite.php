@@ -13,10 +13,8 @@ class Orm_Sources_Sqlite extends Orm_Sources {
         }
     }
 
-    public function query($sql, array $params = [], $result_type = 0, $object_type = 0) {
-//echo "******************new query*********************\n";
-//var_dump($sql, $params, $result_type, $object_type);
-//echo "\n\n";
+    public function query($sql, array $params = [],
+        $result_type = Orm_Sources::SINGLE_RESULT, $object_type = Orm_Sources::THIS_OBJECT) {
         $results = [];
         try {
             $sth = $this->dbh->prepare($sql);
@@ -35,6 +33,4 @@ class Orm_Sources_Sqlite extends Orm_Sources {
         }
         return $results;
     }
-
-
 }
